@@ -1,0 +1,1 @@
+copy c:\windows\system32\calc.exe c:\program.exe
