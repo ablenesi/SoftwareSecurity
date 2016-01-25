@@ -1,0 +1,1 @@
+cl Lab06_01.c sqlite3.c 
