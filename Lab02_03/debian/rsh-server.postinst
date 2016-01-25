@@ -1,0 +1,12 @@
+#!/bin/sh -e
+# $Id: rsh-server.postinst,v 1.3 1999/09/05 14:44:57 herbert Exp $
+
+if [ "$1" = configure -a -z "$2" ]; then
+	update-inetd --group BSD --add "shell		stream	tcp	nowait	root	/usr/sbin/tcpd	/usr/sbin/in.rshd"
+	update-inetd --group BSD --add "login		stream	tcp	nowait	root	/usr/sbin/tcpd	/usr/sbin/in.rlogind"
+	update-inetd --group BSD --add "exec		stream	tcp	nowait	root	/usr/sbin/tcpd	/usr/sbin/in.rexecd"
+else
+	update-inetd --enable shell,login,exec
+fi
+
+#DEBHELPER#

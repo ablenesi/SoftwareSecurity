@@ -1,0 +1,183 @@
+netkit-rsh (0.17-15) unstable; urgency=low
+
+  * Fixed /etc/pam.d/ files. (Closes: #546394, #489589)
+    Also make them use common-*
+  * Clean debian/rules.
+  * Moved to debhelper compat 7
+  * Bumped Standards-Version to 3.8.4.
+  * Improved package description (Closes: #493476, #493474)
+
+ -- Alberto Gonzalez Iniesta <agi@inittab.org>  Sat, 19 Jun 2010 20:54:08 +0200
+
+netkit-rsh (0.17-14) unstable; urgency=low
+
+  * Patched rlogin/rlogin.c to fix FTBFS on Hurd.
+    Thanks Samuel Thibault for the patch (Closes: #437417)
+  * Removed '-s' from install calls in the Makefiles.
+    (Closes: #437614)
+  * Bumped Standards-Version to 3.7.2.2. No change
+  * Moved to debhelper compatibility 4. Created debian/compat.
+    Fixed debian/rules
+  * rsh-server: Added dependency on inet-superserver
+
+ -- Alberto Gonzalez Iniesta <agi@inittab.org>  Thu, 16 Aug 2007 10:55:38 +0200
+
+netkit-rsh (0.17-13) unstable; urgency=low
+
+  * Patched rlogin.c so that calling it as 'netkit-rlogin' will also
+    work. (Closes: #279095)
+  * Changed maintainer email address.
+
+ -- Alberto Gonzalez Iniesta <agi@inittab.org>  Mon,  8 Nov 2004 11:26:33 +0100
+
+netkit-rsh (0.17-12) unstable; urgency=low
+
+  * New Maintainer. (Closes: #249710)
+  * Added versioned Depends on debhelper.
+  * Removed uid=0 requirement to use -p switch.
+    Thanks Adam Boileau for the patch. (Closes: #244788)
+
+ -- Alberto Gonzalez Iniesta <agi@agi.as>  Wed, 19 May 2004 16:24:02 +0200
+
+netkit-rsh (0.17-11) unstable; urgency=low
+
+  * Added LFS support to rcp (closes: #219323).
+
+ -- Herbert Xu <herbert@debian.org>  Wed, 19 Nov 2003 22:30:05 +1100
+
+netkit-rsh (0.17-10) unstable; urgency=low
+
+  * Removed build/install stamps from debian/rules.
+  * Fixed address length in rexecd connect(2) call (Hiroyuki YAMAMORI).
+
+ -- Herbert Xu <herbert@debian.org>  Fri, 19 Sep 2003 20:05:05 +1000
+
+netkit-rsh (0.17-9) unstable; urgency=low
+
+  * Optimised IPv4/IPv6 port number setting.
+  * Fixed name verification for mapped addresses (closes: #205865).
+  * Added IPv6 support for rcp (Hiroyuki YAMAMORI, closes: #205866).
+
+ -- Herbert Xu <herbert@debian.org>  Sat, 13 Sep 2003 21:34:56 +1000
+
+netkit-rsh (0.17-8) unstable; urgency=low
+
+  * Added -f option to disable Nagle in rlogind (closes: #198153).
+  * Moved pam_nologin to the top of PAM files.
+  * Added IPv6 support based on Thorsten Kukuk's work (closes: #165059).
+
+ -- Herbert Xu <herbert@debian.org>  Sat, 19 Jul 2003 15:19:57 +1000
+
+netkit-rsh (0.17-7) unstable; urgency=low
+
+  * Added support for systems with no ARG_MAX.
+  * Only do FSUID_HACK on Linux.
+  * Allocate path dynamically in rcp.
+  * Use ttyname(3) to in rlogind.
+  * Conditionalised OCRNL/TABDLY/TAB3 on the Hurd.
+  * rlogind -a is now always turned on.  The local_domain check was bogus as
+    gethostname(2) on Linux does not return a domain name.  This should be
+    removed eventually as tcpd checks this anyway.
+  * The above changes were based on a patch by Robert Millan (closes: #169251).
+
+ -- Herbert Xu <herbert@debian.org>  Sun, 17 Nov 2002 13:25:04 +1100
+
+netkit-rsh (0.17-6) unstable; urgency=low
+
+  * Do chdir after setuid in rexecd (Loïc Lefort, closes: #119473).
+  * Added -p option to rlogin(1) (closes: #114446).
+
+ -- Herbert Xu <herbert@debian.org>  Wed, 14 Nov 2001 19:00:59 +1100
+
+netkit-rsh (0.17-5) unstable; urgency=low
+
+  * Added -i option to rlogin (Russell Coker, closes: #102172).
+  * Added PAM environment support in rexecd (closes: #101334).
+
+ -- Herbert Xu <herbert@debian.org>  Tue, 26 Jun 2001 22:39:00 +1000
+
+netkit-rsh (0.17-4) unstable; urgency=low
+
+  * Don't treat netkit-rsh as a hostname (closes: #89463).
+  * Replaced rshd's conversation function with one that always fails.
+  * Documented the fact that the rsh protocol doesn't support PAM modules
+    requiring conversation (closes: #88667).
+
+ -- Herbert Xu <herbert@debian.org>  Sun, 29 Apr 2001 19:46:00 +1000
+
+netkit-rsh (0.17-3) unstable; urgency=low
+
+  * Removed unnecessary configure check for termcap (closes: #85518).
+
+ -- Herbert Xu <herbert@debian.org>  Sun, 11 Feb 2001 11:08:30 +1100
+
+netkit-rsh (0.17-2) unstable; urgency=low
+
+  * Made changes for dpkg-statoverride (closes: #83760).
+
+ -- Herbert Xu <herbert@debian.org>  Sun, 28 Jan 2001 21:44:09 +1100
+
+netkit-rsh (0.17-1) unstable; urgency=low
+
+  * New upstream release.
+  * Tagged pam.d files as conffiles (closes: #79969).
+  * Removed reference to cracklib in pam.d files (closes: #79971).
+
+ -- Herbert Xu <herbert@debian.org>  Wed, 20 Dec 2000 19:31:27 +1100
+
+netkit-rsh (0.16.1-1) unstable; urgency=low
+
+  * New upstream release.
+  * Do openpty/fork instead of forkpty so that we can pass the tty to PAM
+    (closes: #58665).
+  * Renamed r* to netkit-r* so that alternatives can be used (closes: #58808).
+
+ -- Herbert Xu <herbert@debian.org>  Sun,  9 Apr 2000 15:23:47 +1000
+
+netkit-rsh (0.10-7) frozen unstable; urgency=low
+
+  * Removed hosts.equiv(5) (closes: #56211).
+
+ -- Herbert Xu <herbert@debian.org>  Sat, 29 Jan 2000 12:36:02 +1100
+
+netkit-rsh (0.10-6) unstable; urgency=low
+
+  * Updated rhosts(5) to match the behaviour of pam_rhosts (closes: #29816).
+
+ -- Herbert Xu <herbert@debian.org>  Fri, 12 Nov 1999 15:48:09 +1100
+
+netkit-rsh (0.10-5) unstable; urgency=low
+
+  * Added support for pam_env.so with patch from Andrews Degert
+    (closes: #48406).
+  * FHS changes.
+
+ -- Herbert Xu <herbert@debian.org>  Mon,  1 Nov 1999 17:35:16 +1100
+
+netkit-rsh (0.10-4) unstable; urgency=low
+
+  * Surround rcmd() with setfsuid()'s (fixes #44854).
+
+ -- Herbert Xu <herbert@debian.org>  Thu, 23 Sep 1999 17:06:46 +1000
+
+netkit-rsh (0.10-3) unstable; urgency=low
+
+  * rexecd actually works now.
+
+ -- Herbert Xu <herbert@debian.org>  Tue, 21 Sep 1999 07:52:19 +1000
+
+netkit-rsh (0.10-2) unstable; urgency=low
+
+  * Documented the obsolete options -hlL (fixes #30630).
+  * No longer uses pam_pwdb because it is broken with respect to NIS.
+
+ -- Herbert Xu <herbert@debian.org>  Wed,  8 Sep 1999 12:48:33 +1000
+
+netkit-rsh (0.10-1) unstable; urgency=low
+
+  * Initial Release.
+  * Enabled PAM (fixes #26711).
+  * Removed unknown options from manual pages (fixes #26307).
+
+ -- Herbert Xu <herbert@debian.org>  Sun,  5 Sep 1999 19:08:21 +1000
+

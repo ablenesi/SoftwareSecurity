@@ -1,0 +1,11 @@
+#!/bin/sh -e
+# $Id: rsh-server.postrm,v 1.1 1999/09/05 09:57:08 herbert Exp $
+
+# If netbase is not installed, then we don't need to do the remove.
+if [ "$1" = purge ] && command -v update-inetd >/dev/null 2>&1; then
+	update-inetd --remove "shell	.*	/usr/sbin/in.rshd"
+	update-inetd --remove "login	.*	/usr/sbin/in.rlogind"
+	update-inetd --remove "exec	.*	/usr/sbin/in.rexecd"
+fi
+
+#DEBHELPER#

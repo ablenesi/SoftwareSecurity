@@ -1,0 +1,30 @@
+.\" Copyright (c) 1995 Peter Tobias <tobias@et-inf.fho-emden.de>
+.\" This file may be distributed under the GNU General Public License.
+.TH RHOSTS 5 "29 Jan 1995" "Linux" "Linux Programmer's Manual"
+.SH NAME
+$HOME/.rhosts \- grants or denies password-free \fBr\fP-command access
+to a specific user account
+.SH DESCRIPTION
+The \fB.rhosts\fP file allows or denies a user who has an account on the
+local host to use the \fBr\fP-commands (e.g. \fBrlogin\fP, \fBrsh\fP or
+\fBrcp\fP) without supplying a password.
+.PP
+The file uses the following format:
+.TP
+\fIhostname\fP \fI[username]\fP
+.PP
+Such an entry grants password-free \fBr\fP-command access for the user with
+the login name \fIusername\fP from the remote host \fIhostname\fP.
+If no user name is specified, the user must have the same login name on
+the remote host and the local host. For security reasons you should always
+use the FQDN of the hostname and not the short hostname.
+.PP
+Netgroups can be specified by preceeding the netgroup by an @ sign.
+.PP
+The \fB.rhosts\fP file must be owned by the user or root, and writable only
+by the owner.
+.PP
+.SH FILES
+$HOME/.rhosts
+.SH "SEE ALSO"
+.BR hosts.equiv "(5), " rshd "(8), " rlogind (8)

@@ -1,0 +1,14 @@
+#!/bin/sh -e
+# $Id: rsh-client.postinst,v 1.1 2000/12/20 08:51:37 herbert Exp $
+
+update-alternatives --install /usr/bin/rcp rcp /usr/bin/netkit-rcp 100 \
+		    --slave /usr/share/man/man1/rcp.1.gz rcp.1.gz \
+			    /usr/share/man/man1/netkit-rcp.1.gz
+update-alternatives --install /usr/bin/rsh rsh /usr/bin/netkit-rsh 100 \
+		    --slave /usr/share/man/man1/rsh.1.gz rsh.1.gz \
+			    /usr/share/man/man1/netkit-rsh.1.gz
+update-alternatives --install /usr/bin/rlogin rlogin /usr/bin/netkit-rlogin \
+		    100 --slave /usr/share/man/man1/rlogin.1.gz rlogin.1.gz \
+			    /usr/share/man/man1/netkit-rlogin.1.gz
+
+#DEBHELPER#

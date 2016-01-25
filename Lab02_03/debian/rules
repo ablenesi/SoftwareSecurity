@@ -1,0 +1,95 @@
+#!/usr/bin/make -f
+# Sample debian/rules that uses debhelper. GNU copyright 1997 by Joey Hess.
+
+# Uncomment this to turn on verbose mode.
+#export DH_VERBOSE=1
+
+CDEFS := -Ddebian -DFSUID_HACK -D_GNU_SOURCE
+
+build:
+	dh_testdir
+
+	if [ ! -f MCONFIG ]; then \
+		./configure; \
+		sed -e 's/^CFLAGS=\(.*\)$$/CFLAGS= $(CDEFS) -g \1/' \
+			MCONFIG > MCONFIG.new; \
+		mv MCONFIG.new MCONFIG; \
+	fi
+	$(MAKE)
+
+clean:
+	dh_testdir
+	dh_testroot
+
+	[ ! -f MCONFIG ] || $(MAKE) distclean
+
+	dh_clean
+
+install: build
+	dh_testdir
+	dh_testroot
+	dh_prep
+	dh_installdirs
+
+	$(MAKE) -C rcp INSTALLROOT=`pwd`/debian/rsh-client/ MANDIR=/usr/share/man install
+	$(MAKE) -C rlogin INSTALLROOT=`pwd`/debian/rsh-client/ MANDIR=/usr/share/man install
+	$(MAKE) -C rsh INSTALLROOT=`pwd`/debian/rsh-client/ MANDIR=/usr/share/man install
+	$(MAKE) -C rexecd INSTALLROOT=`pwd`/debian/rsh-server/ MANDIR=/usr/share/man install
+	$(MAKE) -C rlogind INSTALLROOT=`pwd`/debian/rsh-server/ MANDIR=/usr/share/man install
+	$(MAKE) -C rshd INSTALLROOT=`pwd`/debian/rsh-server/ MANDIR=/usr/share/man install
+
+## rsh-client
+	mv debian/rsh-client/usr/bin/rcp debian/rsh-client/usr/bin/netkit-rcp
+	mv debian/rsh-client/usr/bin/rsh debian/rsh-client/usr/bin/netkit-rsh
+	mv debian/rsh-client/usr/bin/rlogin debian/rsh-client/usr/bin/netkit-rlogin
+	mv debian/rsh-client/usr/share/man/man1/rcp.1 \
+	   debian/rsh-client/usr/share/man/man1/netkit-rcp.1
+	mv debian/rsh-client/usr/share/man/man1/rsh.1 \
+	   debian/rsh-client/usr/share/man/man1/netkit-rsh.1
+	mv debian/rsh-client/usr/share/man/man1/rlogin.1 \
+	   debian/rsh-client/usr/share/man/man1/netkit-rlogin.1
+	cp debian/pam.d/r* debian/rsh-server/etc/pam.d
+## rsh-server
+	rm debian/rsh-server/usr/share/man/man8/r*
+	cp debian/*.5 debian/rsh-server/usr/share/man/man5
+	cp debian/*.8 debian/rsh-server/usr/share/man/man8
+	cp debian/checkrhosts debian/rsh-server/usr/sbin
+	cp debian/hosts.equiv debian/rsh-server/etc
+
+# Build architecture-independent files here.
+binary-indep: build install
+# We have nothing to do by default.
+
+# Build architecture-dependent files here.
+binary-arch: build install
+#	dh_testversion
+	dh_testdir
+	dh_testroot
+	dh_installdocs
+	dh_installexamples
+	dh_installmenu
+#	dh_installemacsen
+#	dh_installpam
+#	dh_installinit
+	dh_installcron
+#	dh_installmanpages
+#	dh_undocumented
+	dh_installchangelogs ChangeLog
+	dh_link
+	dh_strip
+	dh_compress
+	dh_fixperms
+	# You may want to make some executables suid here.
+	chmod 4755 debian/rsh-client/usr/bin/*
+#	dh_makeshlibs
+	dh_installdeb
+	dh_shlibdeps
+	dh_gencontrol
+	dh_md5sums
+	dh_builddeb
+
+source diff:
+	@echo >&2 'source and diff are obsolete - use dpkg-source -b'; false
+
+binary: binary-indep binary-arch
+.PHONY: build clean binary-indep binary-arch binary install

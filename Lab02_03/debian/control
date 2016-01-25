@@ -1,0 +1,22 @@
+Source: netkit-rsh
+Section: net
+Priority: extra
+Maintainer: Alberto Gonzalez Iniesta <agi@inittab.org>
+Standards-Version: 3.8.4
+Build-Depends: debhelper (>= 7), libpam-dev
+
+Package: rsh-client
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Conflicts: suidmanager (<< 0.50)
+Replaces: netstd
+Description: client programs for remote shell connections
+ This package contains rsh, rcp and rlogin.
+
+Package: rsh-server
+Architecture: any
+Depends: openbsd-inetd | inet-superserver, ${shlibs:Depends}, ${misc:Depends}
+Replaces: netstd
+Description: server program for remote shell connections
+ This package contains rexecd, rlogind and rshd.
+

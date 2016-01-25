@@ -1,0 +1,10 @@
+#!/bin/sh -e
+# $Id: rsh-client.prerm,v 1.2 2001/02/24 13:04:45 herbert Exp $
+
+if [ "$1" = remove ] || [ "$1" = deconfigure ]; then
+	update-alternatives --remove rcp /usr/bin/netkit-rcp
+	update-alternatives --remove rsh /usr/bin/netkit-rsh
+	update-alternatives --remove rlogin /usr/bin/netkit-rlogin
+fi
+
+#DEBHELPER#
