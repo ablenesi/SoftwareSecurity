@@ -13,9 +13,23 @@ echo $login_form;
 
 if (isset($_POST["submit"]))
 {
-  $res = $conn->query("SELECT user_id, rights FROM users where user_name='".$_POST["username"]."' AND password='".$_POST["password"]."'");
+  
+  echo "Prepared\n";
+  if (!($stmt = $conn->prepare("SELECT user_id, rights FROM users where user_name = ? AND password = ?"))) {
+     echo "Prepare failed: (" . $mysqli->errno . ") " . $mysqli->error;
+  }
 
-  if (0 == $res->num_rows)
+  echo "Binded\n";
+  if (!$stmt->bind_param("ss", $_POST["username"], $_POST["password"])) {
+    echo "Binding parameters failed: (" . $stmt->errno . ") " . $stmt->error;
+  }
+
+  echo "Executed\n";
+  if (!$stmt->execute()) {
+    echo "Execute failed: (" . $stmt->errno . ") " . $stmt->error;
+  }
+
+  if (!$stmt->fetch())
   {
     echo "Incorrect username or password<br/>";
 
