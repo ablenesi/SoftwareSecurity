@@ -23,9 +23,9 @@ static char_to_html_entry char_to_html[] = {
 
 int isMetaChar(char c)
 {
-    int i=0;
+    int i = 0;
     
-    for (i=0; i<CHAR_TO_HTML_NUM; i++)
+    for (i = 0; i < CHAR_TO_HTML_NUM; i++)
     {
         if (char_to_html[i].c == c)
         {
@@ -39,12 +39,12 @@ int isMetaChar(char c)
 //
 // Return value: the size of the generated string
 //
-size_t html_escape(char* toescape, char* escaped)
+size_t html_escape(char* toescape, char* escaped, size_t destination_size)
 {
     size_t ret = 0;
-    int n;
+    int n = 0;
     
-    while (*toescape)
+    while ((ret < (destination_size -1)) && *toescape)
     {
         n = isMetaChar(*toescape);
         if (-1 == n)
@@ -56,27 +56,44 @@ size_t html_escape(char* toescape, char* escaped)
         }
         else
         {
-            memcpy(escaped, char_to_html[n].h, char_to_html[n].s);
-            escaped += char_to_html[n].s;
+            ret += char_to_html[n].s;
+            if(ret < (destination_size -1)){
+                memcpy(escaped, char_to_html[n].h, char_to_html[n].s);
+                escaped += char_to_html[n].s;
+                toescape++;
+            }else{
+                break;
+            }
+        }
+    }
+
+    while(*toescape){
+        n = isMetaChar(*toescape);
+        if (-1 == n)
+        {
             toescape++;
+            ret++;
+        }else{
+            toescape += char_to_html[n].s;
             ret += char_to_html[n].s;
         }
     }
     
     *escaped = '\0';
+    ret++;
     
     return ret;
 }
 
 int main()
 {
-    size_t n;
+    size_t n = 0;       // intitialised
     char buff[100];
     char encoded[100];
     
     printf("String to escape:\n");
     scanf("%99[^\n]s", buff);
     
-    n = html_escape(buff, encoded);
-    printf("Html escaped version:\n%s", encoded);
+    n = html_escape(buff, encoded, sizeof(encoded));
+    printf("Html escaped version:\n%s\nSize: %d\n", encoded, n);
 }

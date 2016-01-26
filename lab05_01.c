@@ -7,7 +7,9 @@ void test_strncpy()
     char buff[10];
     
     strncpy(buff, "1234567890", sizeof(buff));
-    printf(buff);printf("\n");
+    buff[9] = '\0';
+
+    printf("%s\n", buff);
  }
 
 void test_strncat()
@@ -15,9 +17,9 @@ void test_strncat()
     char buff[10];
     
     strncpy(buff, "1234567", sizeof(buff));
-    strncat(buff, "1234", sizeof(buff));
+    strncat(buff, "1234", sizeof(buff) - strlen(buff) - 1);
     
-    printf(buff);printf("\n");
+    printf("%s\n", buff);
 }
 
 // Copied from FreeBSD man pages:
@@ -41,31 +43,49 @@ void test_strncat()
 
 size_t strlcpy(char* destination, char* source, size_t dest_size)
 {
-    while (*source)
+    size_t size = 0;
+
+    if(dest_size == 0){
+        return strlen(source);
+    }
+
+    while ((size < (dest_size - 1)) && *source)
     {
         *destination = *source;
         destination++;
         source++;
+        size++;
     }
     
     *destination = '\0';
+    return size + strlen(source);
 }
 
 size_t strlcat(char* destination, char* source, size_t dest_size)
 {
+
+    size_t size = 0;
+    if(dest_size == 0){
+        return strlen(source);
+    }
+
     while (*destination)
     {
         destination++;
+        size++;
     }
     
-    while (*source)
+    while ((size < (dest_size -1)) && *source)
     {
         *destination = *source;
         destination++;
         source++;
+        size++;
     }
     
     *destination = '\0';
+
+    return size + strlen(source);
 }
 
 void test_strlcpy()
@@ -77,13 +97,15 @@ void test_strlcpy()
     {
         printf("tst_cpy>strlcpy source too long\n");
         return;
+    }else{
+        printf("%s\n", buff);
     }
     
-    if (strlcpy(buff+n, "123", sizeof(buff)) >= sizeof(buff))
-    {
-        printf("tst_cpy>strlcpy second problem\n");
-        return;
-    }
+    // if (strlcpy(buff+n, "123", sizeof(buff)) >= sizeof(buff))
+    // {
+    //     printf("tst_cpy>strlcpy second problem\n");
+    //     return;
+    // }
 }
 
 void test_strlcat()
