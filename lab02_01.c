@@ -77,7 +77,7 @@ int scanfile(const char* filename, const char* pattern)
         goto cleanup;
     }
 
-    res = fread(content, size_of_file, 1, f);
+    res = fread(content, size_of_file, 1, f); // visszateriti, h hany byte-ot tudott kiolvasni
     if (!res)
     {
        
@@ -86,7 +86,12 @@ int scanfile(const char* filename, const char* pattern)
 
     ptrn_len = strlen(pattern);
 
-    for (i = content; i < content + size_of_file - ptrn_len; i++)
+	// kell az if (ellenorzeskent)
+	if (size_of_file < ptrn_len){
+		goto cleanup; // kilepes
+	}
+    
+	for (i = content; i <= content + size_of_file - ptrn_len; i++) // hiba: kell az = , mivel nem olvassa az utolso karaktert
     {
         if (!memcmp(i, pattern, ptrn_len))
         {
@@ -123,8 +128,8 @@ int main(int argc, char** argv)
     }
 
     // getting the filename and the pattern from the arguments
-    strncpy(filename, argv[1], sizeof(filename));
-    strncpy(pattern, argv[2], sizeof(pattern));
+    strncpy(filename, argv[1], (sizeof(filename) - 1)); // hiba: "-1" kell
+    strncpy(pattern, argv[2], (sizeof(pattern) - 1)); // hiba: "-1" kell
 
     found = scanfile(filename, pattern);
     if (found)

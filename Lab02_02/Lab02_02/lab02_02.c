@@ -29,7 +29,7 @@ int validate_ip_address(char* ip_address)
     num_start = ip_address;
     ip_length = strlen(ip_address);
 
-    for (i=0; i<=ip_length; i++)
+    for (i=0; i<=ip_length; i++) 
     {
         if (isdigit(ip_address[i]))
         {
@@ -101,7 +101,6 @@ int host_lookup(char* ip_address, char* hostname)
 #else
     // for windows
     WSADATA startupData;
-    struct in_addr addr = { 0 };
 #endif
 
 #ifndef WIN32
@@ -111,8 +110,7 @@ int host_lookup(char* ip_address, char* hostname)
 #else
     // for windows
     WSAStartup(MAKEWORD(2, 2), &startupData);   // initializing sockets library
-    addr.s_addr = inet_addr(ip_address);
-    hp = gethostbyaddr( (char*)&addr, 4, AF_INET);   // getting the hostname
+    hp = gethostbyaddr( ip_address, strlen(ip_address), AF_INET);   // getting a hostname
     WSACleanup();   // uninitialize socket library
 #endif
 
@@ -122,7 +120,12 @@ int host_lookup(char* ip_address, char* hostname)
         return 0;
     }
 
-    strcpy(hostname, hp->h_name);
+	// 1. hiba !!!!!!!!!!!!!!!!!!
+	if (strlen(hostname) > 63){
+		return 0;
+	}
+
+    strcpy(hostname, hp->h_name); 
 
     return 1;
 }
@@ -137,7 +140,8 @@ int main(int argc, char** argv)
     memset(hostname, 0, sizeof(hostname));      // preinit the hostname
 
     printf("Provide an IP address: ");
-    res = scanf("%16s", ip_address);    // scans maximum 16 characters into the ip_address local variable
+	// 2. hiba !!!!!!!!!!!!!!!!!!!!
+    res = scanf("%15s", ip_address);    // scans maximum 16 characters into the ip_address local variable
     if (0 == res)
     {
         // no valid string was provided on the standard input
