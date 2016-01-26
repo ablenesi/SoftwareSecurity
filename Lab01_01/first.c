@@ -28,34 +28,49 @@ int main()
 {
     STACK stack;            // stack used to reorder the characters in the words
     char buffer[200];       // input buffer
-    char* output;           // output string
-    long length;            // length of the string
-    char i;                 // input index variable
-    char o;                 // output index variable
+	//char* buffer;
+	char* output = "";           // output string
+    long length = 0;            // length of the string
+    int i;                 // input index variable
+    int o;                 // output index variable
     char c;                 // character from the stack
+	int size = 199;
+	int error;
 
     //
     // Initializations
     //
     StackInit(&stack);
     
+	//buffer = (char*)malloc(size*sizeof(char));
+
     //
     // Reading a string from the standard input
     //
 
     printf("Input: ");
-    scanf("%[^\n]s", buffer);       // reading a string until the first newline character
-    printf("Read:  %s\n", buffer);  // printing out the original buffer
+	
+	if (scanf_s("%[^\n]s", buffer, size) == 0) {
+		printf("Error!\n");
+		exit(0);
+	}// reading a string until the first newline character
+
+	printf("Read:  %s\n", buffer);  // printing out the original buffer
     
     length = strlen(buffer);        // calculating the length of string
     printf("Length of string: %d\n", length);
+
+	/*if (length > 200){
+		printf("Error!\n");
+		exit(0);
+	}*/
 
     if (length == 0)                // if the string is empty we have nothing to do
     {
         printf("No input string!");
         goto cleanup;
     }
-
+	
     output = malloc(length+1);      // allocating a character in plus, because the length does not include the ending \0
     memset(output, '\0', length+1); // filling the buffer with null characters
 
@@ -76,8 +91,12 @@ int main()
         }
         else
         {
-            StackPush(&stack, buffer[i]);    // it's the part of the word, so we need to put on the stack
-        }
+            error = StackPush(&stack, buffer[i]);    // it's the part of the word, so we need to put on the stack
+			if (error == 0){
+				printf("Error: Stack index!\n");
+				exit(0);
+			}
+		}
     }
 
     printf("Output: %s\n", output); // printing the output string

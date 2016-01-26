@@ -7,5 +7,5 @@ typedef struct _STACK {
 } STACK, *PSTACK;
 
 void StackInit(PSTACK Stack);               // This function initializes the stack structure
-void StackPush(PSTACK Stack, char Value);   // This function pushes a value on our stack
+int StackPush(PSTACK Stack, char Value);   // This function pushes a value on our stack
 char StackPop(PSTACK Stack);                // This function pops an element from our stack

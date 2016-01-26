@@ -6,10 +6,16 @@ void StackInit(PSTACK Stack)
     Stack->Values[0] = 0;
 }
 
-void StackPush(PSTACK Stack, char Value)
+int StackPush(PSTACK Stack, char Value)
 {
+	if (Stack->Index >= 50){
+		return 0;
+	}
+
     Stack->Values[Stack->Index] = Value;
     Stack->Index += 1;
+
+	return 1;
 }
 
 char StackPop(PSTACK Stack)
