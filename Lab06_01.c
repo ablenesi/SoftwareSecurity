@@ -13,6 +13,55 @@
 #define snprintf _snprintf
 #endif
 
+int check_for_chars(char* invalid_characters, char* input){
+   char *c = mystring = input;
+   while (*c)
+   {
+       if (strchr(invalid_characters, *c))
+       {
+          return 1; // not OK
+       }
+
+       c++;
+   }
+   return 0; // OK
+}
+char *str_replace(char *find , char *replace , char *str)
+{
+    char  *p = NULL , *old = NULL , *new_str = NULL ;
+    int c = 0 , find_size;
+     
+    find_size = strlen(find);
+     
+    for(p = strstr(str , find) ; p != NULL ; p = strstr(p + find_size , find))
+    {
+        c++;
+    }
+     
+    c = ( strlen(replace) - find_size )*c + strlen(str);
+     
+    new_str = malloc( c );
+    
+    if(new_str == NULL){
+        return NULL;
+    }
+
+    strcpy(new_str , "");
+     
+    old = str;
+     
+    for(p = strstr(str , find) ; p != NULL ; p = strstr(p + find_size , find))
+    {
+        strncpy(new_str + strlen(new_str) , old , p - old);
+        strcpy(new_str + strlen(new_str) , replace);
+        old = p + find_size;
+    }
+     
+    strcpy(new_str + strlen(new_str) , old);
+     
+    return new_str;
+}
+
 void check_file_content()
 {
     char filepath[100];
@@ -21,8 +70,16 @@ void check_file_content()
     FILE* f = NULL;
     
     printf("File path: ");
-    scanf("%99s", filename);
-    
+    scanf("%93s", filename);
+    filename[93] = 0;
+
+    if(check_for_chars("\\/" , filename) != 0){
+        printf("Invalid char in filename\n");
+        return;
+    }
+
+    // Validate filename for directory traverse it might be to larg cutting of the .txt from the end
+
     snprintf(filepath, sizeof(filepath), ".\\%s.txt", filename);
     
     f = fopen(filepath, "r");
@@ -62,14 +119,22 @@ void check_file_content()
 void check_registry_content()
 {
     char regpath[100];
-    char userguid[100];
+    char userguid[36];
     HKEY hKey = NULL;
     LONG res;
     
     printf("User GUID: ");
-    scanf("%99s", userguid);
+    scanf("%35s", userguid);
+    userguid[35] = 0;
     
     // checking if it's a special user (must have a key in it's profile key)
+
+    if(check_for_chars("\\/" , filename) != 0){
+        printf("Invalid char in filename\n");
+        return;
+    }
+    //returns -1 on owerflow 
+    // regpath size (userguid + SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\ProfileList\\\\Secret) < 100
     snprintf(regpath, sizeof(regpath), "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\ProfileList\\%s\\Secret", userguid);
     
     res = RegOpenKeyA(HKEY_LOCAL_MACHINE, regpath, &hKey);
@@ -97,10 +162,19 @@ void check_shell()
     char message[100];
     char command[200];
     
-    fgetchar();
+    getchar();
     
     printf("Message: ");
     scanf("%99[^\n]s", message);
+    message[99] = 0;
+
+    if(check_for_chars("\"&|<>`;" , message) != 0){
+        printf("Invalid char in message\n");
+        return;
+    }
+
+    // s = 123\"|| char.exe\" starts the calc.exe
+    // check for : "&|<>`
     
     snprintf(command, sizeof(command), "echo \"Your message: %s\"", message);
     
@@ -130,16 +204,29 @@ void check_sql()
     char* errormsg;
     int found = 0;
     
-    fgetchar();
+    getchar();
     printf("Username: ");
     scanf("%99[^\n]s", username);
-    fgetchar();
+    getchar();
     printf("Password: ");
     scanf("%99[^\n]s", password);
-    fgetchar();
+    getchar();
     
     // Constructing SQL query
-    snprintf(query, sizeof(query), "SELECT username, password FROM users WHERE username='%s' AND password='%s'", username, password);
+    char* pusername = str_replace("`","``",username);
+    char* ppassword = str_replace("`","``", password);
+    
+    if(pusername == NULL || ppassword == NULL){
+        printf("Could not process input\n");
+        return;
+    }
+    
+    if(300 - (70 + sizeof(pusername) + sizeof(ppassword)) < 0){
+        printf("Input to long\n");
+        return;
+    }
+
+    snprintf(query, sizeof(query), "SELECT username, password FROM users WHERE username='%s' AND password='%s'", pusername, ppassword);
     printf("QUERY string: %s\n", query);
     
     if (SQLITE_OK != sqlite3_open("database.db", &conn))
