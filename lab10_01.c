@@ -4,6 +4,8 @@
 
 #define MAX_THREAD_NUM 1000
 
+pthread_mutex_t lock;
+
 typedef struct _MY_LIST_ENTRY
 {
     struct _MY_LIST_ENTRY* next;
@@ -27,10 +29,14 @@ init_list(PMY_LIST_ENTRY list)
 void
 insert_list(PMY_LIST_ENTRY list, PMY_LIST_ENTRY entry)
 {
-    entry->prev = list;
+	pthread_mutex_lock(&lock);
+
+	entry->prev = list;
     entry->next = list->next;
     list->next->prev = entry;
     list->next = entry;
+
+	pthread_mutex_unlock(&lock);
 }
 
 int
@@ -42,16 +48,21 @@ is_empty_list(PMY_LIST_ENTRY list)
 PMY_LIST_ENTRY
 pop_list(PMY_LIST_ENTRY list)
 {
+	pthread_mutex_lock(&lock);
+
     PMY_LIST_ENTRY entry = NULL;
 
     if (is_empty_list(list))
     {
+		pthread_mutex_unlock(&lock);
         return NULL;
     }
 
     entry = list->prev;
     entry->prev->next = list;
     list->prev = entry->prev;
+
+	pthread_mutex_unlock(&lock);
 
     return entry;
 }
@@ -91,6 +102,12 @@ int main()
     int i;
     int j;
 
+	if (pthread_mutex_init(&lock, NULL) != 0)
+	{
+		printf("\n mutex init failed\n");
+		return 1;
+	}
+
     init_list(&gList);
 
     for (j = 0; j < 1000; j++)
@@ -106,4 +123,6 @@ int main()
         }
         printf(".");
     }
+
+	pthread_mutex_destroy(&lock);
 }
