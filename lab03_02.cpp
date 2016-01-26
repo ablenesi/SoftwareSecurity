@@ -4,10 +4,21 @@
 #include <cstring>
 #include <cctype>
 #include <climits>
+#include <new>
 
 char* trim(char *input, int length) {
+    if(length < 0){
+        return NULL;
+    }
+
     char *output;
-    char *message = (char*)malloc(sizeof(char)*(length + 1));
+    char *message = (char*) malloc(sizeof(char)*(length + 1));
+
+    if(message == NULL){
+        printf("Couldn't allocate memory.");
+        return NULL;
+    }
+
     int index;
 
     // copy input string to a temporary string
@@ -18,7 +29,10 @@ char* trim(char *input, int length) {
 
     // trim trailing whitespace
     int len = index - 1;
-    while (isspace(message[len])) {
+    if(len < 0){
+        return NULL;
+    }
+    while (len >= 0 && isspace(message[len])) {
         message[len] = '\0';
         len--;
     }
@@ -46,9 +60,25 @@ int find(char* input, char c)
 
 void fibo(int num)
 {
+    if(num < 2){
+        printf("To small num value.");
+        return;
+    }
+
+    if(num > INT_MAX / sizeof(int)){
+        printf("To big num value.");
+        return;   
+    }
+
     int* nums = NULL;
 
-    nums = new int[num];
+    // PROBLEM 
+    try{
+        nums = new int[num];        
+    }catch(std::bad_alloc& ba){
+        printf("Couldn't allocate memory");
+        return;
+    }
     nums[0] = 1;
     nums[1] = 1;
 
@@ -60,13 +90,26 @@ void fibo(int num)
         printf("%d ", nums[i]);
     }
     printf("\n");
+
+    delete[]nums;
 }
 
 void fibo2(int num)
 {
+    if(num < 2){
+        printf("To small num value.");
+        return;
+    }
+
     int* nums = NULL;
 
-    nums = (int*)malloc(num);
+    nums = (int*)malloc(num * sizeof(int));
+    
+    if(nums == NULL){
+        printf("Couldn't allocate memory.");
+        return;
+    }
+
     nums[0] = 1;
     nums[1] = 1;
 
@@ -78,11 +121,15 @@ void fibo2(int num)
         printf("%d ", nums[i]);
     }
     printf("\n");
+
+    if(nums != NULL){
+        free(nums);
+    }
 }
 
 int main()
 {
-    char* input = "Hello World!    ";
+    char* input = (char*) "Hello World!    ";
     int   input2 = 10;
     char* trimmed = NULL;
     char* afterspace = NULL;
@@ -90,19 +137,36 @@ int main()
 
     len = strlen(input);
     trimmed = trim(input, len);
+    if(trimmed == NULL){
+        printf("Failed at trim()");
+        return 1;
+    }
 
     printf("Original string: '%s'\nTrimmed string: '%s'\n", input, trimmed);
 
-    afterspace = (char*)malloc(len);
+    afterspace = (char*)malloc(len * sizeof(char));
     if (NULL == afterspace)
     {
         printf("Insufficient resources\n");
         return 1;
     }
 
-    strncpy(afterspace, &input[find(input, ' ')], len);
+    if(find(input, ' ') > 0 && find(input, ' ') <= len){
+        strncpy(afterspace, &input[find(input, ' ')], len);
+    }else{
+        printf("Wrong find return value.");
+    }
+
     printf("String after the first space: '%s'\n", afterspace);
 
     fibo(input2);
     fibo2(input2);
+
+    if(afterspace != NULL){
+        free(afterspace);    
+    }
+    if(trimmed != NULL){
+        free(trimmed);
+    }
+
 }

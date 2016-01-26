@@ -9,7 +9,7 @@ int main()
     HANDLE hFile = INVALID_HANDLE_VALUE;
     CHAR* content = NULL;
     CHAR* str = NULL;
-    DWORD dwRead = 0;
+    DWORD dwRead = 0; //unsigned long
 
     __try
     {
@@ -21,14 +21,28 @@ int main()
             FILE_ATTRIBUTE_NORMAL,
             NULL
             );
-        if (hFile = INVALID_HANDLE_VALUE)
+        // MISTAKE  NR. 1
+        if (hFile == INVALID_HANDLE_VALUE) // = => ==
         {
             printf("File can not be opened\n");
             __leave;
         }
 
         content = malloc(CFG_MAX_SIZE);
+        // MISTAKE  NR. 2
+        // We have to test the return value of the malloc
+        if(content == NULL){
+            printf("Couldn't allocate memory for content.\n");
+            __leave;
+        }
+
         str = malloc(CFG_MAX_SIZE);
+        // MISTAKE  NR. 3
+        // We have to test the return value of the malloc
+        if(str == NULL){
+            printf("Couldn't allocate memory for str.\n");
+            __leave;
+        }
 
         if (!ReadFile(hFile, content, CFG_MAX_SIZE, &dwRead, NULL))
         {
@@ -36,18 +50,27 @@ int main()
             __leave;
         }
 
-        strcpy(str, content);
+        // MISTAKE  NR. 4
+
+        strncpy(str, content, CFG_MAX_SIZE - 1);
 
         /// ... do whatever you want with the strings
     }
     __finally
     {
-        if (NULL != hFile)
+        if (INVALID_HANDLE_VALUE != hFile) // if(NULL != hFile) MISTAKE
         {
             CloseHandle(hFile);
         }
 
-        free(content);
-        free(str);
+        // We have to check for NULL values
+        if(NULL != content){
+            free(content);    
+        }
+        
+        // We have to check for NULL values
+        if(NULL != str){
+           free(str);
+        }
     }
 }

@@ -1,5 +1,9 @@
 #ifndef _LAB03_03_H_
 #define _LAB03_03_H_
+#include <cstring> // size_t
+#include <cstdio>  // printf
+#include <cstdlib> // size_t
+#include <climits> // limits
 
 //
 // This library provides safe integer and string functions;
@@ -9,8 +13,8 @@
 //
 
 //
-// Author: 
-// Group: 
+// Author: Blenesi Attila
+// Group: 531
 //
 
 typedef enum SAFE_RESULT
@@ -19,12 +23,12 @@ typedef enum SAFE_RESULT
     resOVERFLOW,    // An overlow happened
     resUNDERFLOW,   // An underflow happened
     resDIVBYZERO,   // Division with 0 is not defined
-};
+} SAFE_RESULT;
 
 // source - source null terminated string what will be copied into destination
 // destination - destination buffer
 // length - length of the destination buffer (with the null character)
-SAFE_RESULT safe_strcpy(char* source, char* destination, size_t length);
+SAFE_RESULT safe_strcpy(char* source, char* destination, std::size_t length);
 
 // result == a+b if no error has occurred
 SAFE_RESULT safe_intadd(int a, int b, int* result);
