@@ -60,15 +60,23 @@ int main()
     print_ids();
     
     // dropping priviledges
-    setuid(my_user_uid);
-    setgid(99); // nobody
+    if(setegid(99)==-1){
+        printf("ERROR set Group id(99) \n");
+    }
+    if(seteuid(my_user_uid) == -1){
+        printf("ERROR set User id(my_user_uid) \n");
+    }
     
     printf("# Running as unpriviledged process\n");
     print_ids();
     
     // gaining priviledges back
-    setgid(0);
-    setuid(0);
+    if(seteuid(0)==-1){
+        printf("ERROR at User id(0)\n");
+    }
+    if(setegid(0)==-1){
+        printf("ERROR set Group id(0)\n");
+    }
     
     printf("# Running as root again\n");
     print_ids();
