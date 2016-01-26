@@ -7,9 +7,9 @@
 void
 list_parent()
 {
-    char* args[] = {"ls", "-l", "../", NULL};
+    char* args[] = {"/bin/ls", "-l", "../", NULL};
         
-    execvp("ls", args);
+    execvp("/bin/ls", args);
 }
 
 int
@@ -19,11 +19,19 @@ write_file(char* string)
     struct stat fs;
     
     fd = open("hello.txt", O_RDWR);
+    
+    if (fd == 0 || fd == 1 || fd == 2)
+    {
+        goto error;
+    }
+
     if (fd < 0)
     {
         printf("Could not open the file\n");
         return -1;
     }
+
+    if(S_ISLNK(fd)) goto error;
     
     if (0 != fstat(fd, &fs))
     {
