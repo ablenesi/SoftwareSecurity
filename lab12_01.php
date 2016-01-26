@@ -5,25 +5,71 @@
 <body>
 <form action="#">
   Name:<br>
-  <input type="text" name="name" value="<?php if (isset($_GET['name'])) echo $_GET['name'] ?>">
+  <input type="text" name="name" value="<?php if (isset($_GET['name'])) echo htmlspecialchars($_GET['name']) ?>">
   <br>
   Email:<br>
-  <input type="text" name="email" value="<?php if (isset($_GET['email'])) echo $_GET['email'] ?>">
+  <input type="text" name="email" value="<?php if (isset($_GET['email'])) echo htmlspecialchars($_GET['email']) ?>">
   <br>
   Message:<br>
-  <input type="text" name="message" value="<?php if (isset($_GET['message'])) echo $_GET['message'] ?>">
+  <input type="text" name="message" value="<?php if (isset($_GET['message'])) echo htmlspecialchars($_GET['message']) ?>">
   <br><br>
   <input type="submit" value="Preview" name="preview">
   <input type="submit" value="Submit" name="submit">
 </form>
+<br>
+<br>
+<h1>CLAC</h1>
+command: <br>
+<form action="#">
+  <input type="text" name="calc" value="<?php if (isset($_GET['calc'])) echo $_GET['calc'] ?>">
+  <input type="submit" value="Submit" name="submit_calc">
+</form>
+<?php
+if(!empty($_GET['submit_calc'])){
+  if(!empty($_GET['calc'])){
+    if(preg_match('/[-+]?[0-9]*([-+*\/][-+]?[0-9]+)*$/', htmlspecialchars($_GET['calc']))){
+      $a = 0;
+      $a = eval('return '.htmlspecialchars($_GET['calc']).';');
+      echo "<strong>".$a."</strong>";
+    }else{
+      echo "<strong>Wrong input ".htmlspecialchars($_GET['calc'])."</strong>";      
+    }
+  }
+}
+  
+?>
+<br>
+<br>
+
+<h1>PING</h1>
+ip: <br>
+<form action="#">
+  <input type="text" name="ip" value="<?php if (isset($_GET['ip'])) echo $_GET['ip'] ?>">
+  <input type="submit" value="Submit" name="submit_ip">
+</form>
+<?php
+if(!empty($_GET['submit_calc'])){
+  if(!empty($_GET['ip'])){
+    if(preg_match('/^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$/', htmlspecialchars($_GET['ip']))){
+      $b = "NO RESULT";
+      $b = shell_exec('ping -c 3 '.htmlspecialchars($_GET['ip']));
+      echo "<strong>".$b."</strong>";
+    }else{
+      echo "<strong>"."Wrong input ".htmlspecialchars($_GET['ip'])."</strong>";      
+    }
+  }
+}
+  
+?>
+<br>
+<br>
 </body>
 </html>
 <?php
-
-$host="localhost";
-$username="guestbook";
-$password="hr6X2BfvmdUqMjVe";
-$db_name="guestbook";
+$host="localhost:8889";
+$username="root";
+$password="root";
+$db_name="soft_sec";
 
 $conn = mysqli_connect($host, $username, $password)or die("cannot connect to the server"); 
 $conn->select_db($db_name)or die("cannot select database");
@@ -31,13 +77,13 @@ $conn->select_db($db_name)or die("cannot select database");
 if(!empty($_GET['preview']))
 {
     # the preview button was clicked
-    echo "<div><b>Preview:</b><br/>".$_GET['message']."</div>";
+    echo "<div><b>Preview:</b><br/>".htmlspecialchars($_GET['message'])."</div>";
 }
 else if(!empty($_GET['submit']))
 {
     # the submit button was clicked
     $prep = $conn->prepare("INSERT INTO guestbook (name, email, comment, datetime) VALUES (?, ?, ?, now())") or die("Error in prepare");
-    $prep->bind_param("sss", $_GET['name'], $_GET['email'], $_GET['message']) or die("Error in bind_param");
+    $prep->bind_param("sss", htmlspecialchars($_GET['name']), htmlspecialchars($_GET['email']), htmlspecialchars($_GET['message'])) or die("Error in bind_param");
     $prep->execute() or die("Error in execute");
     $prep->close() or die("Error in close");
 }
