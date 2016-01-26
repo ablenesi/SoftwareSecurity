@@ -53,21 +53,22 @@ function config_sessions()
   
   if (isset($_SESSION["page_id"]))
   {
-    $sess_page_id = $_SESSION["page_id"];
+    $sess_page_id = $_SESSION["page_id"];  
   }
 
-  if (isset($_GET["page_id"]))
-  {
-    $sess_page_id = $_GET["page_id"];
-  }
-  
   $sess_page_name = $PAGE_DICT[$sess_page_id];
   
   if (isset($_SESSION["user_name"]))
   {
     $sess_user_name = $_SESSION["user_name"];
   }
-  
+
+  if (isset($_GET["page_id"]) && isset($_GET["token"]))
+  {
+    check_token_get();
+    $sess_page_id = $_GET["page_id"];
+  }
+    
   if (isset($_SESSION["user_email"]))
   {
     $sess_user_email = $_SESSION["user_email"];
@@ -99,5 +100,25 @@ function sess_set_user_info($name, $email)
 }
 
   config_sessions();
+
+// Generating token
+function get_token() {
+    global $sess_user_name;
+    global $sess_page_name;
+    return sha1($sess_user_name.$sess_page_name);
+}
+
+// Check for token GET
+function check_token_get(){
+    if(strcmp(get_token(), $_GET["token"]) !== 0){
+        die("Preventing CSRF.");
+    }
+}
+// Check for token POST
+function check_token_post(){
+    if(strcmp(get_token(), $_POST["token"]) !== 0){
+        die("Preventing CSRF.");
+    }
+}
 
 ?>

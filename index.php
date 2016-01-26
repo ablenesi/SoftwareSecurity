@@ -1,5 +1,7 @@
 <?php
   // Setting up error reporting
+  
+  // Cross site reference forging
   error_reporting(E_ALL);
 
   include "config/mysql_conn.php";

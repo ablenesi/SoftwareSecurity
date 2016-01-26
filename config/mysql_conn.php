@@ -1,8 +1,7 @@
 <?php
 
-$db_servername = "localhost";
-$db_name       = "lab13";
-$db_username   = "lab13";
-$db_password   = "uq4V6n8yJTHfa7Br";
-
+$db_servername = "localhost:8889";
+$db_name       = "soft_sec_13";
+$db_username   = "root";
+$db_password   = "root";
 ?>
