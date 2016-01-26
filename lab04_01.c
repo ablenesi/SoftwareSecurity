@@ -12,16 +12,18 @@ typedef struct {
     size_t pos;
 } buffer_t;
 
+// Sajat memoriacim megjegyzesere
 typedef struct {
-    unsigned long tag;
-    size_t size;
-    char buffer[0];
+    unsigned long tag;  // Tag a memoriacimhez
+    size_t size;        // A foglalt memoria nagysaga
+    char buffer[0];     // A memoriacim
 } memory_t;
 
 buffer_t g_buffer;
 
 void fatal();
 
+// gets the address for the allocated memory_t struct
 memory_t* getmem(void* mem)
 {
     return (memory_t*)(((char*)mem) - sizeof(memory_t));
@@ -31,10 +33,22 @@ void* myalloc(size_t size, unsigned long tag)
 {
     memory_t* res;
 
-    if (size == 0)
+    if (size == 0){
         return NULL;
+    }
+
+    // Check for overflow in the addition
+    if(size > SIZE_T_MAX - sizeof(memory_t)){
+        return NULL;
+    }
 
     res = malloc(size + sizeof(memory_t));
+    
+    // Check for succesfull malloc
+    if(res == NULL){
+        return NULL;
+    }
+    
     res->tag = tag;
     res->size = size;
 
@@ -61,6 +75,9 @@ void* myrealloc(void* memory, size_t size)
 
     mem = getmem(memory);
     res = myalloc(size, mem->tag);
+    if ( res == NULL ){
+        return NULL;
+    }
     memcpy(res, memory, mem->size);
     myfree(memory, mem->tag);
 
@@ -72,22 +89,43 @@ void buffer_init(buffer_t* buffer)
     buffer->size = BUFFER_INIT_SIZE;
     buffer->pos = 0;
     buffer->buffer = myalloc(buffer->size, 'BUFF');
+    // Check for succesful allocation
+    if(buffer->buffer == NULL){
+        fatal();
+    }
+    buffer->buffer[0] = '\0';
 }
 
 void buffer_append(buffer_t* buffer, size_t size, char* toappend)
 {
-    if (buffer->pos + size > buffer->size)
+    // Check for overflow in the addition
+    if(size > SIZE_T_MAX - buffer->pos){
+        fatal();
+    }
+
+    if (buffer->pos + size >= buffer->size)
     {
-        buffer->size += size;
-        if (buffer->size > BUFFER_MAX_SIZE)
+        // Check for overflow in the addition
+        if(size > SIZE_T_MAX - buffer->size){
+            fatal();
+        }
+
+        // buffer->size += size; memory corruption solved by moving the addition after the if
+        // the fatal() function would overwrite the memory after the buffer by size length 
+        if (buffer->size + size > BUFFER_MAX_SIZE)
         {
             fatal();
         }
+
+        buffer->size += size;
         buffer->buffer = myrealloc(buffer->buffer, buffer->size);
     }
 
+    
     memcpy(&buffer->buffer[buffer->pos], toappend, size);
     buffer->pos += size;
+
+    // Off by one memory corruption ( solved by >= on line ~105 )
     buffer->buffer[buffer->pos] = 0;
 }
 
@@ -100,12 +138,16 @@ void fatal()
 {
     printf("Fatal error occurred\n");
 
-    memset(g_buffer.buffer, 0, g_buffer.size);
-    buffer_free(&g_buffer);
+    // Check if the buffer is NULL
+    if(g_buffer.buffer != NULL){
+        memset(g_buffer.buffer, 0, g_buffer.size);
+        buffer_free(&g_buffer);
+    }
 
     exit(1);
 }
 
+// Read 99 char strings and concatenate to a buffer
 int main()
 {
     char lbuf[100];

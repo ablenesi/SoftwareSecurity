@@ -38,35 +38,49 @@ word_t* getword(list_entry* entry)
     return (word_t*)entry;
 }
 
+// Set pointers to itself
 void list_init(list_entry* list)
 {
     list->next = list;
     list->prev = list;
 }
 
+// error for writing
 void list_push_back(list_entry* list, list_entry* entry)
 {
     entry->next = list;
     entry->prev = list->prev;
+    list->prev->next=entry;
     list->prev = entry;
 }
 
+// Allocate a new word_t
 word_t* walloc()
 {
     word_t* res;
 
     res = malloc(sizeof(word_t));
+    
+    if(res == NULL){
+        return NULL;
+    }
 
     list_init(&res->entry);
 
     return res;
 }
 
+// Allocate and set the given long
 word_t* walloc_int(long value)
 {
     word_t* res;
 
     res = walloc();
+    
+    if(res == NULL){
+        return NULL;
+    }
+
     res->type = wINTEGER;
     res->integer = value;
 
@@ -77,16 +91,24 @@ word_t* walloc_char(char* value)
 {
     word_t* res;
     res = walloc();
+
+    if(res == NULL){
+        return NULL;
+    }
+    
     res->type = wSTRING;
     res->word = value;
 
     return res;
 }
 
+// Recursive free for the linked list
 void wfree(word_t* word)
 {
+    if(word->type == wSTRING){
+        free(word->word);
+    }
     free(word);
-    free(word->word);
 }
 
 list_entry* list_delete_entry(list_entry* entry)
@@ -141,11 +163,11 @@ void print_word(list_entry* entry)
 void process_word(list_entry* list, char* word)
 {
     long intvalue;
-    char* wend;
+    char* wend, my_word = NULL;
     word_t* w = NULL;
     size_t size;
 
-    intvalue = strtol(word, &wend, 10);
+    intvalue = strtol(word, &wend, 10); // string to long
 
     if (intvalue != 0 || word != wend)
     {
@@ -155,11 +177,11 @@ void process_word(list_entry* list, char* word)
     else
     {
         size = strlen(word);
-        wend = malloc(size+1);
-        if (NULL == wend)
+        my_word = malloc(size + 1);
+        if (NULL == my_word)
             goto _error;
-        memcpy(wend, word, size+1);
-        w = walloc_char(wend);
+        memcpy(my_word, word, size+1);
+        w = walloc_char(my_word);
         if (NULL == w)
             goto _error;
     }
@@ -168,8 +190,12 @@ void process_word(list_entry* list, char* word)
     return;
 
 _error:
-    wfree(w);
-    free(wend);
+    if(w != NULL){
+        wfree(w);
+    }
+    if(my_word!=NULL){
+        free(my_word);
+    }
 }
 
 int main()
